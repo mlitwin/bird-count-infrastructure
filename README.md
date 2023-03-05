@@ -1,98 +1,38 @@
+# BirdCount API
 
-#
+API Backend for [birdcount](https://github.com/mlitwin/bird-count)
 
+## Architecture
 
-
-## Install
-
-### Serverless
-
-https://www.serverless.com/framework/docs/getting-started
-
-###
-
-`npm install`
-
-
-
-### Local DynamoDB
-
-`cd local`
-`docker-compose up -d`
-Then `http://localhost:8000/` for admin
-
+AWS DynamoDB backend with API Gateway / Lambda
 
 ## Development
 
+### Install
 
-### Run service offline
+brew install terraform
 
-```bash
-serverless offline start
-```
+# Raw Notes
 
-```bash
-serverless dynamodb migrate # this imports schema
-```
+https://dynobase.dev/dynamodb-terraform/
 
-```bash
-curl -X POST -H "Content-Type:application/json" http://localhost:3000/dev/observations --data '{ "text": "Learn Serverless" }'
-```
+aws sts get-caller-identity 
 
 
-### Docs
+## Schema
 
-https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-dynamodb
+        AttributeDefinitions: [
+          {"AttributeName": "group", "AttributeType": "S"},
+          {"AttributeName": "timestamp", "AttributeType": "N"}
+        ]
+        KeySchema: [
+          {"AttributeName": "group", "KeyType": "HASH"},
+          {"AttributeName": "timestamp", "KeyType": "SORT"}
+        ]
 
-
-
-
-
-
-
-----
-
-  runtime: nodejs18.x
-  frameworkVersion: '3'
-
-
-
-##
-https://github.com/serverless/examples/blob/v3/aws-node-simple-http-endpoint/serverless.yml
-
-https://github.com/serverless/examples/blob/v3/aws-node-rest-api-with-dynamodb-and-offline/serverless.yml
+## Dev
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/workbench.settingup.install.html - seems cluncky
+Use console
 
 
-
-
-
-
-serverless install -u https://github.com/serverless/examples/tree/v3/aws-node-simple-http-endpoint -n simple-example
-
-
-
-serverless install -u https://github.com/serverless/examples/tree/v3/aws-node-rest-api-with-dynamodb-and-offline -n dynamodb-example
-
-
-
-	
- # serverless.yml
-    service: usersCrud
-    provider: aws
-    functions:
-    # Your Serverless function definitions go here.
-    resources: # CloudFormation template syntax from here on.
-      Resources:
-        usersTable:
-          Type: AWS::DynamoDB::Table
-          Properties:
-            TableName: usersTable
-            AttributeDefinitions:
-              - AttributeName: email
-                AttributeType: S
-            KeySchema:
-              - AttributeName: email
-                KeyType: HASH
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
+https://www.npmjs.com/package/dynamodb-admin - good for localstack
