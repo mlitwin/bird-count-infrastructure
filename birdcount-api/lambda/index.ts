@@ -1,8 +1,13 @@
-import { Context, APIGatewayProxyResult, APIGatewayEvent } from 'aws-lambda'
+import { Handler, APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda'
 
 import dynamodb from './dynamodb'
 
-import { BatchWriteItemCommand } from '@aws-sdk/client-dynamodb'
+import { BatchWriteItemCommand, DynamoDBClient } from '@aws-sdk/client-dynamodb'
+const client = new DynamoDBClient({});
+
+
+type ProxyHandler = Handler<APIGatewayProxyEventV2, APIGatewayProxyResultV2>;
+
 
 function createObservations(input) {
     const timestamp = new Date().getTime()
@@ -41,7 +46,7 @@ async function addObservations(event, context) {
         PutRequest: {
             Item: {
                 id: { S: i.id },
-                timestamp: { N: i.timestamp },
+                timestamp: { N: `${i.timestamp}`},
             },
         },
     }))
@@ -75,11 +80,11 @@ export const handler = async (event: APIGatewayEvent, context: Context): Promise
    };
 };
 */
-export const handler = async (
-    event: APIGatewayEvent,
-    context: Context
-): Promise<APIGatewayProxyResult> => {
-    switch (event.requestContext.httpMethod) {
+export const handler: ProxyHandler = async (
+    event,
+    context
+) => {
+    switch (event.requestContext.http.method) {
         case 'POST':
             return await addObservations(event, context)
         default:
