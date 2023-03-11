@@ -14,10 +14,11 @@ function createObservations(input) {
 
     let error = ''
     const ret = input.map((i) => ({
+        group: i.group,
+        timestamp,
         id: i.id,
         user: i.user,
         count: i.count,
-        timestamp,
     }))
 
     return [ret, error]
@@ -45,8 +46,12 @@ async function addObservations(event, context) {
     const requests = items.map((i) => ({
         PutRequest: {
             Item: {
-                id: { S: i.id },
+                group: { S: i.group},
                 timestamp: { N: `${i.timestamp}`},
+                id: { S: i.id },
+                user: { S: i.user},
+                count: { N: `${i.count}`},
+
             },
         },
     }))

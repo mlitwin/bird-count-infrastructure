@@ -11,6 +11,7 @@ resource "aws_dynamodb_table" "observations_table" {
     name = "timestamp"
     type = "N"
   }
+  
   hash_key  = "group"
   range_key = "timestamp"
 

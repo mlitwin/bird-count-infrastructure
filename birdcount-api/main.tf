@@ -19,3 +19,10 @@ terraform {
   }
 }
 
+locals {
+  region = "us-east-1"
+  app_name = "birdcount-api"
+}
+
+data "aws_caller_identity" "current" {}
+

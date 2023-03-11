@@ -28,8 +28,64 @@ resource "aws_lambda_function" "test_lambda" {
 
   environment {
     variables = {
-      foo = "bar"
+      DYNAMODB_TABLE = aws_dynamodb_table.observations_table.name
     }
   }
 }
 
+
+// dynamodb table Read Policy
+data "aws_iam_policy_document" "readpolicy" {
+  statement {
+    actions = [
+      "dynamodb:DescribeTable",
+      "dynamodb:GetItem",
+      "dynamodb:GetRecords",
+      "dynamodb:ListTables",
+      "dynamodb:Query",
+      "dynamodb:Scan",
+    ]
+
+    resources = [aws_dynamodb_table.observations_table.arn]
+
+    effect = "Allow"
+  }
+}
+
+resource "aws_iam_policy" "readpolicy" {
+  name   = "${local.app_name}-${local.region}-DynamoDb-Read-Policy"
+  policy = "${data.aws_iam_policy_document.readpolicy.json}"
+}
+
+// dynamodb table Write Policy
+data "aws_iam_policy_document" "writepolicy" {
+  statement {
+    actions = [
+      "dynamodb:DeleteItem",
+      "dynamodb:DescribeTable",
+      "dynamodb:GetItem",
+      "dynamodb:GetRecords",
+      "dynamodb:ListTables",
+      "dynamodb:PutItem",
+      "dynamodb:BatchWriteItem",
+      "dynamodb:Query",
+      "dynamodb:Scan",
+      "dynamodb:UpdateItem",
+      "dynamodb:UpdateTable",
+    ]
+
+    resources = [aws_dynamodb_table.observations_table.arn]
+
+    effect = "Allow"
+  }
+}
+
+resource "aws_iam_policy" "writepolicy" {
+  name   = "${local.app_name}-${local.region}-DynamoDb-Write-Policy"
+  policy = "${data.aws_iam_policy_document.writepolicy.json}"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda-attach" {
+  role       = aws_iam_role.iam_for_lambda.name
+  policy_arn = aws_iam_policy.writepolicy.arn
+}
