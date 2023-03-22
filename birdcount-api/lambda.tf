@@ -21,6 +21,33 @@ resource "aws_iam_role_policy_attachment" "lambda-attach" {
   policy_arn = aws_iam_policy.observations_writepolicy.arn
 }
 
+data "aws_iam_policy_document" "observations_s3_policy" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "arn:aws:s3:::birdcount-api-storage/*",
+    ]
+
+  }
+}
+
+resource "aws_iam_policy" "reads3policy" {
+  name   = "${local.app_name}-${local.region}-observations-S3-Read-Policy"
+  policy = "${data.aws_iam_policy_document.observations_s3_policy.json}"
+}
+
+
+resource "aws_iam_role_policy_attachment" "lambda_s3_attach" {
+  role       = aws_iam_role.iam_for_lambda.name
+  policy_arn = aws_iam_policy.reads3policy.arn
+}
+
+
 resource "aws_lambda_function" "observations_lambda" {
   filename      = "${path.module}/lambda/dist/index.zip"
   function_name = "birdcount_api"
