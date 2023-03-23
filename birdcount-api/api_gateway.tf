@@ -65,6 +65,7 @@ resource "aws_apigatewayv2_authorizer" "birdcount_api" {
   api_id                            = aws_apigatewayv2_api.birdcount_api.id
   authorizer_type                   = "REQUEST"
   authorizer_uri                    = aws_lambda_function.observations_lambda_authorizer.invoke_arn
+  authorizer_result_ttl_in_seconds  = 0
   identity_sources                  = ["$request.header.Authorization"]
   name                              = "observations_lambda_authorizer"
   authorizer_payload_format_version = "2.0"

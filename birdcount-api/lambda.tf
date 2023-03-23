@@ -79,12 +79,6 @@ resource "aws_lambda_function" "observations_lambda_authorizer" {
   source_code_hash = filesha256("${path.module}/lambda_authorizer/dist/index.js")
 
   runtime = "nodejs16.x"
-
-  environment {
-    variables = {
-      DYNAMODB_TABLE = aws_dynamodb_table.observations_table.name
-    }
-  }
 }
 
 

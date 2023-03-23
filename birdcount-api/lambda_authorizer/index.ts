@@ -15,7 +15,9 @@ export const handler: APIGatewayRequestSimpleAuthorizerHandlerV2 = async (
   event: APIGatewayRequestAuthorizerEventV2
 ) => {
 
-  const authHeader = event?.headers?.Authorization;
+
+
+  const authHeader = event?.headers?.authorization;
   if (!authHeader) {
     return {
       isAuthorized: false,
