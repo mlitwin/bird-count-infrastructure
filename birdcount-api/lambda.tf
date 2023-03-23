@@ -36,6 +36,11 @@ data "aws_iam_policy_document" "observations_s3_policy" {
   }
 }
 
+resource "aws_iam_role" "iam_for_lambda_authorizer" {
+  name               = "iam_for_lambda_authorizer"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
+
 resource "aws_iam_policy" "reads3policy" {
   name   = "${local.app_name}-${local.region}-observations-S3-Read-Policy"
   policy = "${data.aws_iam_policy_document.observations_s3_policy.json}"
@@ -43,7 +48,7 @@ resource "aws_iam_policy" "reads3policy" {
 
 
 resource "aws_iam_role_policy_attachment" "lambda_s3_attach" {
-  role       = aws_iam_role.iam_for_lambda.name
+  role       = aws_iam_role.iam_for_lambda_authorizer.name
   policy_arn = aws_iam_policy.reads3policy.arn
 }
 
@@ -55,6 +60,23 @@ resource "aws_lambda_function" "observations_lambda" {
   handler       = "index.handler"
 
   source_code_hash = filesha256("${path.module}/lambda/dist/index.js")
+
+  runtime = "nodejs16.x"
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE = aws_dynamodb_table.observations_table.name
+    }
+  }
+}
+
+resource "aws_lambda_function" "observations_lambda_authorizer" {
+  filename      = "${path.module}/lambda_authorizer/dist/index.zip"
+  function_name = "birdcount_api_authorizer"
+  role          = aws_iam_role.iam_for_lambda_authorizer.arn
+  handler       = "index.handler"
+
+  source_code_hash = filesha256("${path.module}/lambda_authorizer/dist/index.js")
 
   runtime = "nodejs16.x"
 
