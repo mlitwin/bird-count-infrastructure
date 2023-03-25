@@ -59,7 +59,7 @@ resource "aws_lambda_function" "observations_lambda" {
   role          = aws_iam_role.iam_for_lambda.arn
   handler       = "index.handler"
 
-  source_code_hash = filesha256("${path.module}/lambda/dist/index.js")
+  source_code_hash = filebase64sha256("${path.module}/lambda/dist/index.zip")
 
   runtime = "nodejs16.x"
 
@@ -76,7 +76,7 @@ resource "aws_lambda_function" "observations_lambda_authorizer" {
   role          = aws_iam_role.iam_for_lambda_authorizer.arn
   handler       = "index.handler"
 
-  source_code_hash = filesha256("${path.module}/lambda_authorizer/dist/index.js")
+  source_code_hash = filebase64sha256("${path.module}/lambda_authorizer/dist/index.zip")
 
   runtime = "nodejs16.x"
 }
