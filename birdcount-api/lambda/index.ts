@@ -33,7 +33,7 @@ function createObservations(input) {
 async function addObservations(event, context) {
   const data = JSON.parse(event.body); // try/catch
 
-  const [items, error] = createObservations(data);
+  const [items, error] = createObservations(data.observations);
 
   if (error) {
     return {

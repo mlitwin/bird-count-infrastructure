@@ -31,7 +31,9 @@ const config = {
   }
 
 axios
-    .post(url, obs, config)
+    .post(url, {
+        observations: obs
+    }, config)
     .then(function (response) {
         console.log(response.data)
     })
