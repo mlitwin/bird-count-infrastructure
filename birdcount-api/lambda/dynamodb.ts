@@ -1,20 +1,19 @@
-'use strict'
+"use strict";
 
-const {
-    DynamoDBClient,
-    BatchExecuteStatementCommand,
-} = require('@aws-sdk/client-dynamodb')
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 
-let options = {}
+let options = {};
 
 // connect to local DB if running offline
 if (process.env.IS_OFFLINE) {
-    options = {
-        region: 'localhost',
-        endpoint: 'http://localhost:8000',
-    }
+  options = {
+    region: "localhost",
+    endpoint: "http://localhost:8000",
+  };
 }
 
-const dynamodb = new DynamoDBClient(options)
+const dynamodbClient = new DynamoDBClient(options);
+const dynamodb = DynamoDBDocumentClient.from(dynamodbClient);
 
-export default dynamodb
+export default dynamodb;

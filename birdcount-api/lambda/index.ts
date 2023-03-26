@@ -7,7 +7,7 @@ import KSUID from "ksuid";
 
 import dynamodb from "./dynamodb";
 
-import { BatchWriteItemCommand } from "@aws-sdk/client-dynamodb";
+import { BatchWriteCommand } from "@aws-sdk/lib-dynamodb";
 type ProxyHandler = Handler<APIGatewayProxyEventV2, APIGatewayProxyResultV2>;
 
 const awsConfig = {
@@ -21,10 +21,9 @@ function createObservations(input) {
   let error = "";
   const ret = input.map((i) => ({
     group: i.group,
-    ksuid: KSUID.randomSync(timestamp),
+    ksuid: KSUID.randomSync(timestamp).toString(),
     id: i.id,
-    user: i.user,
-    count: i.count,
+    data: i
   }));
 
   return [ret, error];
@@ -51,20 +50,14 @@ async function addObservations(event, context) {
 
   const requests = items.map((i) => ({
     PutRequest: {
-      Item: {
-        group: { S: i.group },
-        ksuid: { S: i.ksuid },
-        id: { S: i.id },
-        user: { S: i.user },
-        count: { N: `${i.count}` },
-      },
+      Item: i,
     },
   }));
 
   params.RequestItems[table] = requests;
 
   while (Object.keys(params).length > 0) {
-    const command = new BatchWriteItemCommand(params);
+    const command = new BatchWriteCommand(params);
     const result = await dynamodb.send(command);
     params = result.UnprocessedItems;
   }
