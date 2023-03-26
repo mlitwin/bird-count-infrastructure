@@ -3,6 +3,7 @@ import {
   APIGatewayProxyEventV2,
   APIGatewayProxyResultV2,
 } from "aws-lambda";
+import KSUID from "ksuid";
 
 import dynamodb from "./dynamodb";
 
@@ -15,12 +16,12 @@ const awsConfig = {
 
 
 function createObservations(input) {
-  const timestamp = new Date().getTime();
+  const timestamp = new Date();
 
   let error = "";
   const ret = input.map((i) => ({
     group: i.group,
-    timestamp,
+    ksuid: KSUID.randomSync(timestamp),
     id: i.id,
     user: i.user,
     count: i.count,
@@ -52,7 +53,7 @@ async function addObservations(event, context) {
     PutRequest: {
       Item: {
         group: { S: i.group },
-        timestamp: { N: `${i.timestamp}` },
+        ksuid: { S: i.ksuid },
         id: { S: i.id },
         user: { S: i.user },
         count: { N: `${i.count}` },

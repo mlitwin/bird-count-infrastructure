@@ -17,7 +17,8 @@
     "esbuild": "0.17.10",
     "jsonwebtoken": "^9.0.0",
     "jwks-rsa": "^3.0.1",
-    "jwt-decode": "^3.1.2"
+    "jwt-decode": "^3.1.2",
+    "ksuid": "^3.0.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.110"

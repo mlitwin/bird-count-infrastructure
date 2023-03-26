@@ -8,12 +8,23 @@ resource "aws_dynamodb_table" "observations_table" {
   }
 
   attribute {
-    name = "timestamp"
-    type = "N"
+    name = "ksuid"
+    type = "S"
+  }
+
+  attribute {
+    name = "id"
+    type = "S"
   }
 
   hash_key  = "group"
-  range_key = "timestamp"
+  range_key = "ksuid"
+
+  local_secondary_index {
+    name = "user_created_guid"
+    projection_type = "KEYS_ONLY"
+    range_key = "id"
+  }
 
   point_in_time_recovery {
     enabled = true
